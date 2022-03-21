@@ -4,7 +4,7 @@ import { getSession } from "next-auth/react";
 import type { NextApiRequest, NextApiResponse } from "next"; 
 
 /* Internal Imports */
-import { isValidAddress } from "pages/index";
+import { isValidAddress } from "/pages/index";
 
 // Setup faucet interface
 const iface = new ethers.utils.Interface([

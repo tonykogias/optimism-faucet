@@ -28,23 +28,8 @@ export default function Layout({
 function Head() {
   return (
     <HTMLHead>
-      {/* Google Fonts */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossOrigin="true"
-      />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
-        rel="stylesheet"
-      />
-
-      {/* Favicon */}
-      <link rel="shortcut icon" href="/favicon.ico" />
-
-      {/* Primary Meta Tags */}
-      <title>Optimism Kovan Faucet</title>
+      <link rel="shortcut icon" href="/faucet-op.png" />
+      <title>Faucet | Optimism Kovan</title>
       <meta
         name="title"
         content="Optimism Kovan Faucet"

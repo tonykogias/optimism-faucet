@@ -27,16 +27,15 @@ export default NextAuth({
     },
     callbacks: {
         // Running when use signin/signout
-        jwt: async (token, user, account, profile) => {
-            // Check if user is signing in
-            const isSignIn = user ? true : false;
+        jwt: async (token) => {
+            const isSignIn = token.user ? true : false;
 
             if (isSignIn) {
                 // Attach github user info to prevent bots
-                token.github_id = account?.id;
-                token.github_name = profile?.login;
-                token.github_following = profile?.following;
-                token.github_created_at = profile?.created_at;
+                token.github_id = token.user.id;
+                token.github_name = token.profile.login;
+                token.github_following = token.profile.following;
+                token.github_created_at = token.profile.created_at;
             }
 
             // Resolve JWT
@@ -44,12 +43,12 @@ export default NextAuth({
         },
 
         // Running when we want to retrieve the session e.g. when calling `getSession()`
-        session: async (session, token) => {
+        session: async (session) => {
             // Attach additional params from JWT to session
-            session.github_id = token.github_id;
-            session.github_name = token.github_name;
-            session.github_following = token.github_following;
-            session.github_created_at = token.github_created_at;
+            session.github_id = session.token.github_id;
+            session.github_name = session.token.github_name;
+            session.github_following = session.token.github_following;
+            session.github_created_at = session.token.github_created_at;
 
             // Resolve session
             return Promise.resolve(session);

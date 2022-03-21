@@ -24,6 +24,12 @@
     margin: 0px auto;
     color: #19232d;
   }
+
+  .home__title {
+    display:flex;
+    flex-direction:row;
+    justify-content: center;
+  }
 }
 
 .address {
@@ -55,7 +61,6 @@
   }
 }
 
-// Unauthenticated claim status
 .content__unauthenticated {
   p {
     margin: 0px;
@@ -66,7 +71,6 @@
   }
 }
 
-// Authenticated claim status
 .content__authenticated {
   > button {
     display: inline-block;
@@ -88,7 +92,6 @@
   }
 }
 
-// Claim card
 .home__card {
   margin-top: 40px;
   background-color: white;
@@ -117,54 +120,7 @@
   }
 }
 
-.home__card_content_section {
-  padding: 20px;
-  border-bottom: 1px solid rgb(237, 238, 240);
-
-  > h4 {
-    font-weight: 500;
-    font-size: 16px;
-    margin: 0px;
-
-    a {
-      text-decoration: none;
-      color: inherit;
-      text-decoration: underline;
-
-      &:hover {
-        opacity: 0.8;
-      }
-    }
-  }
-
-  .home__card_content_section_lh {
-    line-height: 24px;
-  }
-
-  > span {
-    display: block;
-    color: #6e7a85;
-    font-size: 14px;
-    margin: 2px 0px;
-  }
-
-  > p {
-    color: #19232d;
-    margin: 10px 0px;
-
-    &:nth-last-of-type(1) {
-      margin-bottom: 0px;
-    }
-  }
-}
-
-// Depleted section
-.home__card_depleted {
-  color: #e74747;
-}
-
-// Twitter sign-out button
-.content__twitter {
+.content__github {
   margin-top: 20px;
   width: 100%;
   display: flex;
@@ -179,7 +135,6 @@
   }
 }
 
-// Authenticated claim status — unclaimed
 .content__unclaimed {
   p {
     line-height: 24px;
@@ -198,7 +153,6 @@
   }
 }
 
-// Main blue button
 .button__main {
   width: 100%;
   margin-top: 20px;
@@ -229,7 +183,6 @@
 
 // Responsive
 @media screen and (max-width: 750px) {
-  // Top CTA
   .home__cta {
     > h1 {
       font-size: 2.3rem;
@@ -240,14 +193,12 @@
     }
   }
 
-  // Card
   .home__card {
     p {
       line-height: 24px;
     }
   }
 
-  // Individual address containers
   .address {
     display: block;
     margin-top: 5px;

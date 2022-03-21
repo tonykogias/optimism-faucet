@@ -28,7 +28,7 @@ function isValidAddress(address: string): boolean {
   return true;
 }
 
-export default function Home({ session }: { session: any; }) {
+export default function Home(session:any) {
 
   // Claim address
   const [address, setAddress] = useState<string>("");
@@ -58,29 +58,22 @@ export default function Home({ session }: { session: any; }) {
 
   return (
     <Layout>
-      {/* CTA + description */}
       <div className={styles.home__cta}>
-        <div>
-            <Image src="/faucet-op.png" height="100px" width="120px"/>
-            <h1>Optimism Kovan faucet</h1>
+        <div className={styles.home__title}>
+            <Image src="/faucet-op.png" height="80px" width="95px"/>
+            <h1>Optimism Kovan Faucet</h1>
         </div>
         <span>
-          Fund youw wallet with ETH and DAI on the Optimism Kovan network.
+          Fund youw wallet with 1 ETH and 100 DAI on the Optimism Kovan network.
         </span>
       </div>
-      {/* Claim from facuet card */}
       <div className={styles.home__card}>
-        {/* Card title */}
         <div className={styles.home__card_title}>
           <h3>Request Tokens</h3>
         </div>
-
-        {/* Card content */}
         <div className={styles.home__card_content}>
           {!session ? (
-            // If user is unauthenticated:
             <div className={styles.content__unauthenticated}>
-              {/* Reasoning for Twitter OAuth */}
               <p>
                 To prevent faucet botting, you must sign in with Github. We
                 request{" "}
@@ -93,8 +86,6 @@ export default function Home({ session }: { session: any; }) {
                 </a>{" "}
                 access.
               </p>
-
-              {/* Sign in with Twitter */}
               <button
                 className={styles.button__main}
                 onClick={() => signIn("github")}
@@ -103,9 +94,7 @@ export default function Home({ session }: { session: any; }) {
               </button>
             </div>
           ) : (
-            // If user is authenticated:
             <div className={styles.content__authenticated}>
-                // If user has not claimed in 24h
                 <div className={styles.content__unclaimed}>
                   {/* Claim description */}
                   <p>Enter your Ethereum address to receive tokens:</p>
@@ -118,8 +107,7 @@ export default function Home({ session }: { session: any; }) {
                     onChange={(e) => setAddress(e.target.value)}
                   />
 
-                  {isValidInput(address) ? (
-                    // If address is valid, allow claiming
+                  {isValidAddress(address) ? (
                     <button
                       className={styles.button__main}
                       onClick={processClaim}
@@ -128,7 +116,6 @@ export default function Home({ session }: { session: any; }) {
                       {!loading ? "Claim" : "Claiming..."}
                     </button>
                   ) : (
-                    // Else, force fix
                     <button className={styles.button__main} disabled>
                       {address === ""
                         ? "Enter Valid Address"
@@ -136,12 +123,10 @@ export default function Home({ session }: { session: any; }) {
                     </button>
                   )}
                 </div>
-              }
-
               {/* General among claimed or unclaimed, allow signing out */}
-              <div className={styles.content__twitter}>
+              <div className={styles.content__github}>
                 <button onClick={() => signOut()}>
-                  Sign out @{session.github_name}
+                  Sign out @{}
                 </button>
               </div>
             </div>
@@ -157,7 +142,7 @@ export async function getServerSideProps(context: any) {
   const session: any = await getSession(context);
   return {
     props: {
-      session,
+      session
     },
   };
 }
