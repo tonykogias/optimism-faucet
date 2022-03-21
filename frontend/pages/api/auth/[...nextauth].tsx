@@ -29,7 +29,6 @@ export default NextAuth({
         // Running when use signin/signout
         jwt: async (token) => {
             const isSignIn = token.user ? true : false;
-
             if (isSignIn) {
                 // Attach github user info to prevent bots
                 token.github_id = token.user.id;
@@ -49,7 +48,6 @@ export default NextAuth({
             session.github_name = session.token.github_name;
             session.github_following = session.token.github_following;
             session.github_created_at = session.token.github_created_at;
-
             // Resolve session
             return Promise.resolve(session);
         },

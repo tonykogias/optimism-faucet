@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { ReactElement, useState } from "react";
 import Image from "next/image";
-import { signIn, getSession, signOut } from "next-auth/react";
+import { signIn, getSession, signOut, useSession } from "next-auth/react";
 
 /* Internal Imports */
 import Layout from "/components/Layout"; 
@@ -28,8 +28,10 @@ function isValidAddress(address: string): boolean {
   return true;
 }
 
-export default function Home(session:any) {
+export default function Home() {
 
+  // Session
+  const { data: session, status } = useSession()
   // Claim address
   const [address, setAddress] = useState<string>("");
   // Loading status
@@ -125,8 +127,8 @@ export default function Home(session:any) {
                 </div>
               {/* General among claimed or unclaimed, allow signing out */}
               <div className={styles.content__github}>
-                <button onClick={() => signOut()}>
-                  Sign out @{}
+                <button onClick={() => signOut(session)}>
+                  Sign out
                 </button>
               </div>
             </div>
