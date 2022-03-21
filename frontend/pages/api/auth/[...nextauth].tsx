@@ -26,10 +26,6 @@ export default NextAuth({
         secret: process.env.JWT_SECRET,
     },
     callbacks: {
-        async redirect(url, baseUrl) {
-            return "/";
-        },
-
         // Running when use signin/signout
         jwt: async (token, user, account, profile) => {
             // Check if user is signing in
@@ -48,15 +44,15 @@ export default NextAuth({
         },
 
         // Running when we want to retrieve the session e.g. when calling `getSession()`
-        session: async (session, user) => {
-          // Attach additional params from JWT to session
-          session.github_id = user.github_id;
-          session.github_name = user.github_name;
-          session.github_following = user.github_following;
-          session.github_created_at = user.github_created_at;
+        session: async (session, token) => {
+            // Attach additional params from JWT to session
+            session.github_id = token.github_id;
+            session.github_name = token.github_name;
+            session.github_following = token.github_following;
+            session.github_created_at = token.github_created_at;
 
-          // Resolve session
-          return Promise.resolve(session);
+            // Resolve session
+            return Promise.resolve(session);
         },
     },
 });

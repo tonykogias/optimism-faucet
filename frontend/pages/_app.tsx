@@ -3,6 +3,9 @@ import type { AppProps } from 'next/app'
 import { SessionProvider } from "next-auth/react";
 import { ToastContainer } from "react-toastify";
 
+/* Internal Imports */
+import "/styles/global.scss";
+
 export default function OPFaucet({ 
   Component,
   pageProps: { session, ...pageProps }

@@ -1,0 +1,26 @@
+// Background colors
+$bg-color: rgb(255, 255, 248);
+
+html {
+  background-color: $bg-color;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+
+  font-feature-settings: "ss01";
+  text-rendering: optimizeLegibility;
+  font-family: "Inter", sans-serif;
+
+  min-height: 100vh;
+  min-width: 100vw;
+  background-color: rgb(255, 255, 248);
+}
+
+button,
+input {
+  font-feature-settings: "ss01";
+  text-rendering: optimizeLegibility;
+  font-family: "Inter", sans-serif;
+}
