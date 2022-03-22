@@ -15,7 +15,7 @@ import styles from "/styles/Home.module.scss";
  * @param {string} address to check
  * @returns {boolean} validity
  */
-function isValidAddress(address: string): boolean {
+export function isValidAddress(address: string): boolean {
   try {
     // Check if address is valid + checksum match
     ethers.utils.getAddress(address);
@@ -48,10 +48,10 @@ export default function Home() {
       // Post new claim with recipient address
       await axios.post("/api/claim/claim", { address });
       // Toast if success + toggle claimed
-      toast.success("Tokens dispersed—check balances shortly!");
+      // toast.success("Tokens dispersed—check balances shortly!");
     } catch (error: any) {
       // If error, toast error message
-      toast.error(error.response.data.error);
+      // toast.error("Can't claim.");
     }
 
     // Toggle loading

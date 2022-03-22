@@ -8,13 +8,13 @@ import { isValidAddress } from "/pages/index";
 
 // Setup faucet interface
 const iface = new ethers.utils.Interface([
-	"function drip(address _recipient) external",
+	"function drip(address _recipient, string _githubid) external",
 ]);
 
 // Generates tx input data for drip claim
-function generateTxData(recipient: string): string {
+function generateTxData(recipient: string, githubid: string): string {
 	// Encode address for drip function
-	return iface.encodeFunctionData("drip", [recipient]);
+	return iface.encodeFunctionData("drip", [recipient, githubid]);
 }
 
 async function processDrip(
@@ -39,7 +39,6 @@ async function processDrip(
       to: process.env.FAUCET_ADDRESS ?? "",
       from: wallet.address,
       gasPrice,
-      // Custom gas override for Arbitrum w/ min gas limit
       gasLimit: 500_000,
       data,
       nonce,
@@ -55,45 +54,42 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	const session: any = await getSession({ req });
 	// Collect address
 	const { address }: string = req.body;
-
+	const ses = session.token.token.token.token.token;
+	console.log("SES: ", ses);
 	if (!session) {
 		// Return unauthed status
 		return res.status(401).send({ error: "Not authenticated." });
 	}
-
 	// Anti-bot checks
-	const ONE_MONTH_SECONDS = 2629746;
+	const ONE_MONTH_MILISECONDS = 2629800000
 	if (
-		session.github_following < 5 ||
+		ses.github_following < 5 ||
 		// Less than 1 month old
-		new Date().getTime() - Date.parse(session.github_created_at).getTime() < ONE_MONTH_SECONDS
+		new Date().getTime() - new Date(ses.github_created_at).getTime() < ONE_MONTH_MILISECONDS
 	) {
 		// Return invalid Github account status
 		return res
 		  .status(400)
 		  .send({ error: "Github account does not pass anti-bot checks." });
 	}
-
 	if (!address || !isValidAddress(address)) {
 		// Return invalid address status
 		return res.status(400).send({ error: "Invalid address." });
 	}
-
-  	let addr: string = address;
+  let addr: string = address;
 	const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY ?? "");
 
 	// Generate transaction data
-	const data: string = generateTxData(addr);
-
+	const data: string = generateTxData(addr, ses.github_id);
 	try {
-    	// Process faucet claims
+    // Process faucet claims
 		await processDrip(wallet, data);
-    } catch (e) {
+  } catch (e) {
 		// If error in process, revert
 		return res
 			.status(500)
 			.send({ error: "Error fully claiming, try again in 15 minutes." });
-    }
+  }
 
-    return res.status(200).send({ claimed: address });
+  return res.status(200).send({ claimed: address });
 }
