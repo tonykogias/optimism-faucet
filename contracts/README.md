@@ -26,6 +26,8 @@ foundryup
 ## Build and Test
 
 ```bash
+# Init submodules
+git submodule update --init --recursive
 # Compile contracts
 forge build
 # Run tests
