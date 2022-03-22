@@ -2,6 +2,7 @@
 import type { AppProps } from 'next/app'
 import { SessionProvider } from "next-auth/react";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 /* Internal Imports */
 import "/styles/global.scss";

@@ -49,10 +49,14 @@ export default function Home() {
       // Post new claim with recipient address
       await axios.post("/api/claim/claim", { address });
       // Toast if success + toggle claimed
-      // toast.success("Tokens dispersed—check balances shortly!");
+      toast.success("Tokens dispersed—check balances!", {
+        theme: "colored"
+      });
     } catch (error: any) {
       // If error, toast error message
-      // toast.error("Can't claim.");
+      toast.error(error.response.data.error, {
+        theme: "colored"
+      });
     }
 
     // Toggle loading

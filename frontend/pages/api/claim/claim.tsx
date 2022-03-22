@@ -22,21 +22,21 @@ async function processDrip(
   data: string
 ): Promise<void> {
   // Collect provider
-  const provider = new ethers.providers.StaticJsonRpcProvider(process.env.INFURA_OP_KOVAN_RPC_URL);
+  const provider = new ethers.providers.StaticJsonRpcProvider(process.env.OP_KOVAN_RPC_URL);
   // Connect wallet to network
   const rpcWallet = wallet.connect(provider);
   // Collect nonce for network
   const nonce = await provider.getTransactionCount(
-      // Collect nonce for operator
-      process.env.OPERATOR_PUBLIC_ADDRESS ?? ""
-    );
+    // Collect nonce for operator
+    process.env.OPERATOR_PUBLIC_ADDRESS ?? ""
+  );
   // Collect gas price * 2 for network
   const gasPrice = (await provider.getGasPrice()).mul(2);
 
   // Return populated transaction
   try {
-    await rpcWallet.sendTransaction({
-      to: process.env.FAUCET_ADDRESS ?? "",
+    const response = await rpcWallet.sendTransaction({
+      to: process.env.FAUCET_ADDRESS,
       from: wallet.address,
       gasPrice,
       gasLimit: 500_000,
@@ -44,6 +44,7 @@ async function processDrip(
       nonce,
       type: 0,
     });
+    await response.wait(r => console.log(r));
   } catch (e) {
     throw new Error("Error when processing drip for network.");
   }
@@ -54,7 +55,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	// Collect address
 	const { address }: string = req.body;
 	const ses = session.token.token;
-	console.log("SES: ", ses);
 	if (!session) {
 		// Return unauthed status
 		return res.status(401).send({ error: "Not authenticated." });
@@ -77,6 +77,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	}
   let addr: string = address;
 	const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY ?? "");
+	const provider = new ethers.providers.StaticJsonRpcProvider(process.env.OP_KOVAN_RPC_URL);
 
 	// Generate transaction data
 	const data: string = generateTxData(addr, ses.github_id);
@@ -85,9 +86,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		await processDrip(wallet, data);
   } catch (e) {
 		// If error in process, revert
+		const contractBalance = ethers.utils.formatEther(
+			await provider.getBalance(process.env.FAUCET_ADDRESS)
+		);
+		if(parseFloat(contractBalance) < 1){
+			return res
+				.status(500)
+				.send({ error: "Faucet is empty."});
+		}
 		return res
 			.status(500)
-			.send({ error: "Error fully claiming, try again in 15 minutes." });
+			.send({ error: "Error while claiming." });
   }
 
   return res.status(200).send({ claimed: address });
