@@ -7,7 +7,8 @@ import Image from "next/image";
 import { signIn, getSession, signOut, useSession } from "next-auth/react";
 
 /* Internal Imports */
-import Layout from "/components/Layout"; 
+import Layout from "/components/Layout";
+import InfoTooltip from "/components/InfoTooltip";
 import styles from "/styles/Home.module.scss";
 
 /**
@@ -77,7 +78,10 @@ export default function Home() {
           {!session ? (
             <div className={styles.content__unauthenticated}>
               <p>
-                To prevent faucet botting, you must sign in with Github. We
+                To prevent faucet botting{" "}
+                <InfoTooltip />
+                {" "}
+                , you must sign in with Github. We
                 request{" "}
                 <a
                   href="https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps"
