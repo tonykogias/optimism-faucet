@@ -22,7 +22,7 @@ contract Tests is OptimismFaucetTest {
         uint256 bobDAIBalanceBefore = BOB.DAIBalance();
 
         // Alice drips to bob
-        ALICE.drip(address(BOB));
+        ALICE.drip(address(BOB), '111');
 
         // Bob after balances
         assertEq(BOB.ETHBalance(), bobETHBalanceBefore + 1 ether);
@@ -31,7 +31,7 @@ contract Tests is OptimismFaucetTest {
 
     /// @notice Prevent dripping if not approved operator
     function testFailDripIfNotOperator() public {
-        BOB.drip(address(ALICE));
+        BOB.drip(address(ALICE), '123');
     }
 
     /// @notice Can add approved operator and they can drip
@@ -43,7 +43,7 @@ contract Tests is OptimismFaucetTest {
         assertTrue(FAUCET.approvedOperators(address(BOB)));
 
         // Ensure Bob can drip
-        BOB.drip(address(ALICE));
+        BOB.drip(address(ALICE), '123211111');
     }
 
     /// @notice Can remove approved operator and they can't drip
@@ -108,7 +108,7 @@ contract Tests is OptimismFaucetTest {
         ALICE.updateDripAmounts(5, 5e18);
 
         // Alice drips to bob
-        ALICE.drip(address(BOB));
+        ALICE.drip(address(BOB), '232424');
 
         // Bob after balances
         assertEq(BOB.ETHBalance(), bobETHBalanceBefore + 5);

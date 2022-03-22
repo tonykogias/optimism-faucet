@@ -42,8 +42,9 @@ contract OptimismFaucetUser {
 
     /// @notice Drips from faucet to recipient
     /// @param _recipient to drip to
-    function drip(address _recipient) public {
-        FAUCET.drip(_recipient);
+    /// @param _githubid to check if claimed last 24hours
+    function drip(address _recipient, string memory _githubid) public {
+        FAUCET.drip(_recipient, _githubid);
     }
 
     /// @notice Drains faucet to a recipient address

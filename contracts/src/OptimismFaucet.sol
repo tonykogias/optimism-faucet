@@ -18,6 +18,10 @@ contract OptimismFaucet {
     uint256 public ETH_AMOUNT = 1e18;
     /// @notice DAI to disperse
     uint256 public DAI_AMOUNT = 1_000e18;
+    /// @notice TIME in seconds of a day
+    uint256 public ONE_DAY_SECONDS = 86400;
+    /// @notice Sting githubids with last claim time
+    mapping(string => uint256) public lastClaim;
     /// @notice Addresses of approved operators
     mapping(address => bool) public approvedOperators;
     /// @notice Addresses of super operators
@@ -75,11 +79,13 @@ contract OptimismFaucet {
 
     /// @notice Drips and mints tokens to recipient
     /// @param _recipient to drip tokens to
-    function drip(address _recipient) external isApprovedOperator {
+    function drip(address _recipient, string memory _githubid) external isApprovedOperator {
+        // Check if same githubid has claimed past 24hours
+        require(canDrip(lastClaim[_githubid]), "Has claimed in the last 24hours");
         // Drip Ether
         (bool sent,) = _recipient.call{value: ETH_AMOUNT}("");
         require(sent, "Failed dripping ETH");
-
+        lastClaim[_githubid] = block.timestamp;
         // Drip DAI
         require(DAI.transfer(_recipient, DAI_AMOUNT), "Failed dripping DAI");
 
@@ -141,6 +147,22 @@ contract OptimismFaucet {
     ) external isSuperOperator {
         ETH_AMOUNT = _ethAmount;
         DAI_AMOUNT = _daiAmount;
+    }
+
+    /// @notice Returns true if a _githubid can drip
+    /// @param  _lastClaimTime uint256 time thet user last claimed
+    /// @return bool has claimed past 24hours
+    function canDrip(uint256 _lastClaimTime) internal view returns (bool) {
+        // incorrect lastClaimTime, is bigger than current time
+        if(_lastClaimTime > block.timestamp)  {
+            return false;
+        }
+
+        if(_lastClaimTime <= 0) {
+            return true;
+        }
+
+        return ((block.timestamp - _lastClaimTime) >= ONE_DAY_SECONDS);
     }
 
     /// @notice Allows receiving ETH
