@@ -2,7 +2,7 @@
 
 A [faucet](https://en.wikipedia.org/wiki/History_of_bitcoin#Bitcoin_faucets) that drips 1 ETH and 100 DAI to the Optimism Kovan network.
 
-READMEs can be found individual subdirectories:
+READMEs can be found individual in subdirectories:
 
 - [Faucet contracts](https://github.com/tonykogias/optimism-faucet/tree/master/contracts)
 - [Associated frontend](https://github.com/tonykogias/optimism-faucet/tree/master/frontend)
