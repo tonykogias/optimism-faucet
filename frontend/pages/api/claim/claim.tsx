@@ -45,7 +45,6 @@ async function processDrip(
       type: 0,
     });
   } catch (e) {
-    console.log(e);
     throw new Error("Error when processing drip for network.");
   }
 }
@@ -54,7 +53,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	const session: any = await getSession({ req });
 	// Collect address
 	const { address }: string = req.body;
-	const ses = session.token.token.token.token.token;
+	const ses = session.token.token;
 	console.log("SES: ", ses);
 	if (!session) {
 		// Return unauthed status
