@@ -1,28 +1,27 @@
 /* External Imports */
 import { ethers } from "ethers"; // Ethers
 import { getSession } from "next-auth/react";
-import type { NextApiRequest, NextApiResponse } from "next"; 
+import type { NextApiRequest, NextApiResponse } from "next";
 
 /* Internal Imports */
-import { isValidAddress } from "../../../pages/index";
+import { isValidAddress } from "pages/index";
 
 // Setup faucet interface
 const iface = new ethers.utils.Interface([
-	"function drip(address _recipient, string _githubid) external",
+  "function drip(address _recipient, string _githubid) external",
 ]);
 
 // Generates tx input data for drip claim
 function generateTxData(recipient: string, githubid: string): string {
-	// Encode address for drip function
-	return iface.encodeFunctionData("drip", [recipient, githubid]);
+  // Encode address for drip function
+  return iface.encodeFunctionData("drip", [recipient, githubid]);
 }
 
-async function processDrip(
-  wallet: ethers.Wallet,
-  data: string
-): Promise<void> {
+async function processDrip(wallet: ethers.Wallet, data: string): Promise<void> {
   // Collect provider
-  const provider = new ethers.providers.StaticJsonRpcProvider(process.env.OP_KOVAN_RPC_URL);
+  const provider = new ethers.providers.StaticJsonRpcProvider(
+    process.env.OP_KOVAN_RPC_URL
+  );
   // Connect wallet to network
   const rpcWallet = wallet.connect(provider);
   // Collect nonce for network
@@ -44,8 +43,8 @@ async function processDrip(
       nonce,
       type: 0,
     });
-    await response.wait().then(r => {
-    	console.log(r);
+    await response.wait().then((r) => {
+      console.log(r);
     });
   } catch (e) {
     throw new Error("Error when processing drip for network.");
@@ -53,51 +52,50 @@ async function processDrip(
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-	const session: any = await getSession({ req });
-	// Collect address
-	const { address }:string = req.body;
-	if (!session) {
-		// Return unauthed status
-		return res.status(401).send({ error: "Not authenticated." });
-	}
-	// Anti-bot checks
-	const ONE_MONTH_MILISECONDS = 2629800000
-	if (
-		session.github_following < 5 ||
-		// Less than 1 month old
-		new Date().getTime() - new Date(session.github_created_at).getTime() < ONE_MONTH_MILISECONDS
-	) {
-		// Return invalid Github account status
-		return res
-		  .status(400)
-		  .send({ error: "Github account does not pass anti-bot checks." });
-	}
-	if (!address || !isValidAddress(address)) {
-		// Return invalid address status
-		return res.status(400).send({ error: "Invalid address." });
-	}
-  let addr: string = address;
-	const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY ?? "");
-	const provider = new ethers.providers.StaticJsonRpcProvider(process.env.OP_KOVAN_RPC_URL);
-	const contractBalance = ethers.utils.formatEther(
-		await provider.getBalance(process.env.FAUCET_ADDRESS ?? "")
-	);
-	if(parseFloat(contractBalance) < 1){
-		return res
-			.status(500)
-			.send({ error: "Faucet is empty."});
-	}
-	// Generate transaction data
-	const data: string = generateTxData(addr, session.github_id);
-	try {
+  const session: any = await getSession({ req });
+  // Collect address
+  const { address } = req.body;
+  if (!session) {
+    // Return unauthed status
+    return res.status(401).send({ error: "Not authenticated." });
+  }
+  // Anti-bot checks
+  const ONE_MONTH_MILISECONDS = 2629800000;
+  if (
+    session.github_following < 5 ||
+    // Less than 1 month old
+    new Date().getTime() - new Date(session.github_created_at).getTime() <
+      ONE_MONTH_MILISECONDS
+  ) {
+    // Return invalid Github account status
+    return res
+      .status(400)
+      .send({ error: "Github account does not pass anti-bot checks." });
+  }
+  if (!address || !isValidAddress(address)) {
+    // Return invalid address status
+    return res.status(400).send({ error: "Invalid address." });
+  }
+  const addr: string = address;
+  const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY ?? "");
+  const provider = new ethers.providers.StaticJsonRpcProvider(
+    process.env.OP_KOVAN_RPC_URL
+  );
+  const contractBalance = ethers.utils.formatEther(
+    await provider.getBalance(process.env.FAUCET_ADDRESS ?? "")
+  );
+  if (parseFloat(contractBalance) < 1) {
+    return res.status(500).send({ error: "Faucet is empty." });
+  }
+  // Generate transaction data
+  const data: string = generateTxData(addr, session.github_id);
+  try {
     // Process faucet claims
-		await processDrip(wallet, data);
+    await processDrip(wallet, data);
   } catch (e) {
-		// If error in process, revert
-		return res
-			.status(500)
-			.send({ error: "Error while claiming." });
+    // If error in process, revert
+    return res.status(500).send({ error: "Error while claiming." });
   }
 
   return res.status(200).send({ claimed: address });
-}
+};

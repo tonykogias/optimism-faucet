@@ -1,8 +1,8 @@
 /* External Imports */
-import { default as HTMLHead } from "next/head";
+import HTMLHead from "next/head";
 
 /* Internal Imports */
-import styles from "/styles/Layout.module.scss";
+import styles from "styles/Layout.module.scss";
 
 // Page layout
 export default function Layout({
@@ -37,10 +37,7 @@ function Head() {
     <HTMLHead>
       <link rel="shortcut icon" href="/faucet-op.png" />
       <title>Faucet | Optimism Kovan</title>
-      <meta
-        name="title"
-        content="Optimism Kovan Faucet"
-      />
+      <meta name="title" content="Optimism Kovan Faucet" />
     </HTMLHead>
   );
 }

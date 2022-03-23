@@ -2,14 +2,14 @@
 import { ethers } from "ethers";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ReactElement, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { signIn, getSession, signOut, useSession } from "next-auth/react";
+import { signIn, getSession, signOut } from "next-auth/react";
 
 /* Internal Imports */
-import Layout from "./../components/Layout";
-import InfoTooltip from "./../components/InfoTooltip";
-import styles from "./../styles/Home.module.scss";
+import Layout from "components/Layout";
+import InfoTooltip from "components/InfoTooltip";
+import styles from "styles/Home.module.scss";
 
 /**
  * Check if a provided address is valid
@@ -20,7 +20,7 @@ export function isValidAddress(address: string): boolean {
   try {
     // Check if address is valid + checksum match
     ethers.utils.getAddress(address);
-  } catch {
+  } catch (e) {
     // If not, return false
     return false;
   }
@@ -29,14 +29,13 @@ export function isValidAddress(address: string): boolean {
   return true;
 }
 
-export default function Home({session}: any) {
-
+export default function Home({ session }: any) {
   // Claim address
   const [address, setAddress] = useState<string>("");
   // Loading status
   const [loading, setLoading] = useState<boolean>(false);
 
-   /**
+  /**
    * Processes a claim to the faucet
    */
   const processClaim = async () => {
@@ -48,12 +47,12 @@ export default function Home({session}: any) {
       await axios.post("/api/claim/claim", { address });
       // Toast if success + toggle claimed
       toast.success("Tokens dispersed—check balances!", {
-        theme: "colored"
+        theme: "colored",
       });
     } catch (error: any) {
       // If error, toast error message
       toast.error(error.response.data.error, {
-        theme: "colored"
+        theme: "colored",
       });
     }
 
@@ -65,8 +64,8 @@ export default function Home({session}: any) {
     <Layout>
       <div className={styles.home__cta}>
         <div className={styles.home__title}>
-            <Image src="/faucet-op.png" height="80px" width="95px"/>
-            <h1>Optimism Kovan Faucet</h1>
+          <Image alt="logo" src="/faucet-op.png" height="80px" width="95px" />
+          <h1>Optimism Kovan Faucet</h1>
         </div>
         <span>
           Fund youw wallet with 1 ETH and 100 DAI on the Optimism Kovan network.
@@ -80,11 +79,8 @@ export default function Home({session}: any) {
           {!session ? (
             <div className={styles.content__unauthenticated}>
               <p>
-                To prevent faucet botting{" "}
-                <InfoTooltip />
-                {" "}
-                , you must sign in with Github. We
-                request{" "}
+                To prevent faucet botting <InfoTooltip /> , you must sign in
+                with Github. We request{" "}
                 <a
                   href="https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps"
                   target="_blank"
@@ -103,34 +99,32 @@ export default function Home({session}: any) {
             </div>
           ) : (
             <div className={styles.content__authenticated}>
-                <div className={styles.content__unclaimed}>
-                  {/* Claim description */}
-                  <p>Enter your Ethereum address to receive tokens:</p>
+              <div className={styles.content__unclaimed}>
+                {/* Claim description */}
+                <p>Enter your Ethereum address to receive tokens:</p>
 
-                  {/* Address input */}
-                  <input
-                    type="text"
-                    placeholder="0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                  />
+                {/* Address input */}
+                <input
+                  type="text"
+                  placeholder="0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                />
 
-                  {isValidAddress(address) ? (
-                    <button
-                      className={styles.button__main}
-                      onClick={processClaim}
-                      disabled={loading}
-                    >
-                      {!loading ? "Claim" : "Claiming..."}
-                    </button>
-                  ) : (
-                    <button className={styles.button__main} disabled>
-                      {address === ""
-                        ? "Enter Valid Address"
-                        : "Invalid Address"}
-                    </button>
-                  )}
-                </div>
+                {isValidAddress(address) ? (
+                  <button
+                    className={styles.button__main}
+                    onClick={processClaim}
+                    disabled={loading}
+                  >
+                    {!loading ? "Claim" : "Claiming..."}
+                  </button>
+                ) : (
+                  <button className={styles.button__main} disabled>
+                    {address === "" ? "Enter Valid Address" : "Invalid Address"}
+                  </button>
+                )}
+              </div>
               {/* General among claimed or unclaimed, allow signing out */}
               <div className={styles.content__github}>
                 <button onClick={() => signOut(session)}>
@@ -142,7 +136,7 @@ export default function Home({session}: any) {
         </div>
       </div>
     </Layout>
-  )
+  );
 }
 
 export async function getServerSideProps(context: any) {
