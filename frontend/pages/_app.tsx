@@ -7,13 +7,10 @@ import "react-toastify/dist/ReactToastify.css";
 /* Internal Imports */
 import "/styles/global.scss";
 
-export default function OPFaucet({ 
-  Component,
-  pageProps: { session, ...pageProps }
-}) {
+export default function OPFaucet({Component, pageProps}: AppProps) {
   return (
     // Wrap app in auth session provider
-    <SessionProvider session={session}>
+    <SessionProvider session={pageProps.session}>
       {/* Toast container */}
       <ToastContainer />
 

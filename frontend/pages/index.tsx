@@ -7,9 +7,9 @@ import Image from "next/image";
 import { signIn, getSession, signOut, useSession } from "next-auth/react";
 
 /* Internal Imports */
-import Layout from "/components/Layout";
-import InfoTooltip from "/components/InfoTooltip";
-import styles from "/styles/Home.module.scss";
+import Layout from "./../components/Layout";
+import InfoTooltip from "./../components/InfoTooltip";
+import styles from "./../styles/Home.module.scss";
 
 /**
  * Check if a provided address is valid
@@ -29,10 +29,8 @@ export function isValidAddress(address: string): boolean {
   return true;
 }
 
-export default function Home() {
+export default function Home({session}: any) {
 
-  // Session
-  const { data: session, status } = useSession()
   // Claim address
   const [address, setAddress] = useState<string>("");
   // Loading status
@@ -136,7 +134,7 @@ export default function Home() {
               {/* General among claimed or unclaimed, allow signing out */}
               <div className={styles.content__github}>
                 <button onClick={() => signOut(session)}>
-                  Sign out
+                  Sign out @{session.github_name}
                 </button>
               </div>
             </div>

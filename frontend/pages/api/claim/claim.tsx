@@ -4,7 +4,7 @@ import { getSession } from "next-auth/react";
 import type { NextApiRequest, NextApiResponse } from "next"; 
 
 /* Internal Imports */
-import { isValidAddress } from "/pages/index";
+import { isValidAddress } from "../../../pages/index";
 
 // Setup faucet interface
 const iface = new ethers.utils.Interface([
@@ -44,7 +44,9 @@ async function processDrip(
       nonce,
       type: 0,
     });
-    await response.wait(r => console.log(r));
+    await response.wait().then(r => {
+    	console.log(r);
+    });
   } catch (e) {
     throw new Error("Error when processing drip for network.");
   }
@@ -53,8 +55,7 @@ async function processDrip(
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 	const session: any = await getSession({ req });
 	// Collect address
-	const { address }: string = req.body;
-	const ses = session.token.token;
+	const { address }:string = req.body;
 	if (!session) {
 		// Return unauthed status
 		return res.status(401).send({ error: "Not authenticated." });
@@ -62,9 +63,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	// Anti-bot checks
 	const ONE_MONTH_MILISECONDS = 2629800000
 	if (
-		ses.github_following < 5 ||
+		session.github_following < 5 ||
 		// Less than 1 month old
-		new Date().getTime() - new Date(ses.github_created_at).getTime() < ONE_MONTH_MILISECONDS
+		new Date().getTime() - new Date(session.github_created_at).getTime() < ONE_MONTH_MILISECONDS
 	) {
 		// Return invalid Github account status
 		return res
@@ -78,22 +79,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   let addr: string = address;
 	const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY ?? "");
 	const provider = new ethers.providers.StaticJsonRpcProvider(process.env.OP_KOVAN_RPC_URL);
-
+	const contractBalance = ethers.utils.formatEther(
+		await provider.getBalance(process.env.FAUCET_ADDRESS ?? "")
+	);
+	if(parseFloat(contractBalance) < 1){
+		return res
+			.status(500)
+			.send({ error: "Faucet is empty."});
+	}
 	// Generate transaction data
-	const data: string = generateTxData(addr, ses.github_id);
+	const data: string = generateTxData(addr, session.github_id);
 	try {
     // Process faucet claims
 		await processDrip(wallet, data);
   } catch (e) {
 		// If error in process, revert
-		const contractBalance = ethers.utils.formatEther(
-			await provider.getBalance(process.env.FAUCET_ADDRESS)
-		);
-		if(parseFloat(contractBalance) < 1){
-			return res
-				.status(500)
-				.send({ error: "Faucet is empty."});
-		}
 		return res
 			.status(500)
 			.send({ error: "Error while claiming." });
