@@ -17,7 +17,7 @@ contract OptimismFaucet {
     /// @notice ETH to disperse
     uint256 public ETH_AMOUNT = 1e18;
     /// @notice DAI to disperse
-    uint256 public DAI_AMOUNT = 1_000e18;
+    uint256 public DAI_AMOUNT = 100e18;
     /// @notice TIME in seconds of a day
     uint256 public ONE_DAY_SECONDS = 86400;
     /// @notice Sting githubids with last claim time
