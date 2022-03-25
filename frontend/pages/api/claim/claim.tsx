@@ -43,9 +43,6 @@ async function processDrip(wallet: ethers.Wallet, data: string): Promise<void> {
       nonce,
       type: 0,
     });
-    await response.wait().then((r) => {
-      console.log(r);
-    });
   } catch (e) {
     throw new Error("Error when processing drip for network.");
   }
