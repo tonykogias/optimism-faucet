@@ -68,7 +68,7 @@ export default function Home({ session }: any) {
           <h1>Optimism Kovan Faucet</h1>
         </div>
         <span>
-          Fund youw wallet with 1 ETH and 100 DAI on the Optimism Kovan network.
+          Fund your wallet with 1 ETH and 100 DAI on the Optimism Kovan network.
         </span>
       </div>
       <div className={styles.home__card}>
@@ -88,7 +88,14 @@ export default function Home({ session }: any) {
                 >
                   read-only
                 </a>{" "}
-                access.
+                access. You can find the smart contract and source code{" "}
+                <a 
+                  href="https://github.com/tonykogias/optimism-faucet"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  here.
+                </a>
               </p>
               <button
                 className={styles.button__main}

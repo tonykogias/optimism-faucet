@@ -73,19 +73,26 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     // Return invalid address status
     return res.status(400).send({ error: "Invalid address." });
   }
-  const addr: string = address;
   const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY ?? "");
   const provider = new ethers.providers.StaticJsonRpcProvider(
     process.env.OP_KOVAN_RPC_URL
   );
+  // Return error if faucet is empty.
   const contractBalance = ethers.utils.formatEther(
     await provider.getBalance(process.env.FAUCET_ADDRESS ?? "")
   );
   if (parseFloat(contractBalance) < 1) {
     return res.status(500).send({ error: "Faucet is empty." });
   }
+  // Return error if the address to drip has already more than 5 ETH
+  const addressBalance = ethers.utils.formatEther(
+    await provider.getBalance(address ?? "")
+  );
+  if (parseFloat(addressBalance) > 5) {
+    return res.status(500).send({ error: "Address has more than 5 ETH." });
+  }
   // Generate transaction data
-  const data: string = generateTxData(addr, session.github_id);
+  const data: string = generateTxData(address, session.github_id);
   try {
     // Process faucet claims
     await processDrip(wallet, data);
