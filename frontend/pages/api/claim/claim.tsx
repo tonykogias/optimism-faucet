@@ -67,7 +67,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     // Return invalid Github account status
     return res
       .status(400)
-      .send({ error: "Github account does not pass anti-bot checks." });
+      .send({ error: "Github anti-bot checks failed: you must follow at least 5 ppl && account older than 1 month" });
   }
   if (!address || !isValidAddress(address)) {
     // Return invalid address status
