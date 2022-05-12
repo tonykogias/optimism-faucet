@@ -8,8 +8,8 @@ import { signIn, getSession, signOut } from "next-auth/react";
 
 /* Internal Imports */
 import Layout from "components/Layout";
-import InfoTooltip from "components/InfoTooltip";
 import styles from "styles/Home.module.scss";
+import InfoTooltip from "components/InfoTooltip";
 
 /**
  * Check if a provided address is valid
@@ -91,7 +91,7 @@ export default function Home({ session }: any) {
                   read-only
                 </a>{" "}
                 access. You can find the smart contract and source code{" "}
-                <a 
+                <a
                   href="https://github.com/tonykogias/optimism-faucet"
                   target="_blank"
                   rel="noopener noreferrer"
