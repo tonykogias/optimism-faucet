@@ -7,17 +7,14 @@ import "./interfaces/IERC20.sol";
 /// Faucet that drips ETH & ERC20 on Optimism
 contract OptimismFaucet {
 
-    /// Immutable storage
-
-    /// @notice DAI ERC20 token
-    IERC20 public immutable DAI;
-
     /// Mutable storage
 
+    /// @notice TOKEN ERC20 token
+    IERC20 public TOKEN;
     /// @notice ETH to disperse
     uint256 public ETH_AMOUNT = 1e18;
-    /// @notice DAI to disperse
-    uint256 public DAI_AMOUNT = 100e18;
+    /// @notice TOKEN to disperse
+    uint256 public TOKEN_AMOUNT = 100e18;
     /// @notice TIME in seconds of a day
     uint256 public ONE_DAY_SECONDS = 86400;
     /// @notice Sting githubids with last claim time
@@ -69,9 +66,9 @@ contract OptimismFaucet {
     /// Constructor
 
     /// @notice Creates a new OptimismFaucet contract
-    /// @param _DAI address of DAI contract
-    constructor(address _DAI) {
-        DAI = IERC20(_DAI);
+    /// @param _TOKEN address of ERC20 contract
+    constructor(address _TOKEN) {
+        TOKEN = IERC20(_TOKEN);
         superOperators[msg.sender] = true;
     }
 
@@ -86,20 +83,24 @@ contract OptimismFaucet {
         (bool sent,) = _recipient.call{value: ETH_AMOUNT}("");
         require(sent, "Failed dripping ETH");
         lastClaim[_githubid] = block.timestamp;
-        // Drip DAI
-        require(DAI.transfer(_recipient, DAI_AMOUNT), "Failed dripping DAI");
+        // Drip TOKEN
+        // For now we will only require to drip ETH so in case the token balance
+        // is low the faucet will still drip ETH
+        if(TOKEN.balanceOf(address(this)) >= TOKEN_AMOUNT) {
+            TOKEN.transfer(_recipient, TOKEN_AMOUNT);
+        }
 
         emit FaucetDripped(_recipient);
     }
 
     /// @notice Returns number of available drips by token
     /// @return ethDrips — available Ether drips
-    /// @return daiDrips — available DAI drips
+    /// @return tokenDrips — available TOKEN drips
     function availableDrips() public view 
-        returns (uint256 ethDrips, uint256 daiDrips) 
+        returns (uint256 ethDrips, uint256 tokenDrips) 
     {
         ethDrips = address(this).balance / ETH_AMOUNT;
-        daiDrips = DAI.balanceOf(address(this)) / DAI_AMOUNT;
+        tokenDrips = TOKEN.balanceOf(address(this)) / TOKEN_AMOUNT;
     }
 
     /// @notice Allows super operator to drain contract of tokens
@@ -109,9 +110,9 @@ contract OptimismFaucet {
         (bool sent,) = _recipient.call{value: address(this).balance}("");
         require(sent, "Failed draining ETH");
 
-        // Drain all DAI
-        uint256 daiBalance = DAI.balanceOf(address(this));
-        require(DAI.transfer(_recipient, daiBalance), "Failed draining DAI");
+        // Drain all TOKENS
+        uint256 tokenBalance = TOKEN.balanceOf(address(this));
+        require(TOKEN.transfer(_recipient, tokenBalance), "Failed draining TOKEN");
 
         emit FaucetDrained(_recipient);
     }
@@ -140,13 +141,19 @@ contract OptimismFaucet {
 
     /// @notice Allows super operator to update drip amounts
     /// @param _ethAmount ETH to drip
-    /// @param _daiAmount DAI to drip
+    /// @param _tokenAmount TOKEN to drip
     function updateDripAmounts(
         uint256 _ethAmount,
-        uint256 _daiAmount
+        uint256 _tokenAmount
     ) external isSuperOperator {
         ETH_AMOUNT = _ethAmount;
-        DAI_AMOUNT = _daiAmount;
+        TOKEN_AMOUNT = _tokenAmount;
+    }
+
+    /// @notice Allows super operator to update the token to drip
+    /// @param _TOKEN address of the new token to start dripping
+    function updateTokenDrip(address _TOKEN) external isSuperOperator {
+        TOKEN = IERC20(_TOKEN);
     }
 
     /// @notice Returns true if a _githubid can drip

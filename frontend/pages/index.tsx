@@ -34,6 +34,8 @@ export default function Home({ session }: any) {
   const [address, setAddress] = useState<string>("");
   // Loading status
   const [loading, setLoading] = useState<boolean>(false);
+  // Claim Kovan
+  const [claimKovan, setClaimKovan] = useState<boolean>(false);
 
   /**
    * Processes a claim to the faucet
@@ -44,7 +46,7 @@ export default function Home({ session }: any) {
 
     try {
       // Post new claim with recipient address
-      await axios.post("/api/claim/claim", { address });
+      await axios.post("/api/claim/claim", { address, isClaimKovan: claimKovan});
       // Toast if success + toggle claimed
       toast.success("Tokens dispersed—check balances!", {
         theme: "colored",
@@ -65,10 +67,10 @@ export default function Home({ session }: any) {
       <div className={styles.home__cta}>
         <div className={styles.home__title}>
           <Image alt="logo" src="/faucet-op.png" height="80px" width="95px" />
-          <h1>Optimism Kovan Faucet</h1>
+          <h1>Optimism Goerli Faucet</h1>
         </div>
         <span>
-          Fund your wallet with 1 ETH and 100 DAI on the Optimism Kovan network.
+          Fund your wallet with 1 ETH and 100 OP on the Optimism Goerli network.
         </span>
       </div>
       <div className={styles.home__card}>
@@ -118,6 +120,18 @@ export default function Home({ session }: any) {
                   onChange={(e) => setAddress(e.target.value)}
                 />
 
+                {/* Kovan checkbox */}
+                <div className={styles.content__unclaimed_kovan}>
+                  <input
+                    type="checkbox"
+                    value={claimKovan.toString()}
+                    onChange={() => setClaimKovan((previous) => !previous)}
+                  />
+                  <label>
+                    Fund your wallet on Optimism Kovan
+                  </label>
+                </div>
+
                 {isValidAddress(address) ? (
                   <button
                     className={styles.button__main}
@@ -140,6 +154,25 @@ export default function Home({ session }: any) {
               </div>
             </div>
           )}
+        </div>
+      </div>
+      <div className={styles.home__card}>
+        <div className={styles.home__card_title}>
+          <h3>Faucet Details</h3>
+        </div>
+        <div className={styles.home__card_content}>
+          <h4>Github Authentication</h4>
+          <p>To pass the anti-bot checks your github account must be older than 1 month and have more than 5 followings.</p>
+          <hr className={styles.home__card_details_hr}/>
+          <h4>Optimism Kovan Support</h4>
+          <p>Optimism Kovan is being{" "} 
+            <a
+               href="https://dev.optimism.io/kovan-to-goerli/"
+               target="_blank"
+               rel="noopener noreferrer"
+            >
+              deprecated
+            </a>, and the faucet migrated to Goerli. The faucet will keep providing ETH and DAI for Kovan until it runs out.</p>
         </div>
       </div>
     </Layout>

@@ -20,13 +20,15 @@ contract Tests is OptimismFaucetTest {
         // Bob before balances
         uint256 bobETHBalanceBefore = BOB.ETHBalance();
         uint256 bobDAIBalanceBefore = BOB.DAIBalance();
+        uint256 faucetBalance = DAI.balanceOf(address(this));
 
         // Alice drips to bob
         ALICE.drip(address(BOB), '111');
 
         // Bob after balances
         assertEq(BOB.ETHBalance(), bobETHBalanceBefore + 1 ether);
-        assertEq(BOB.DAIBalance(), bobDAIBalanceBefore + 1_000e18);
+        if(faucetBalance >= 100)
+            assertEq(BOB.DAIBalance(), bobDAIBalanceBefore + 100e18);
     }
 
     /// @notice Prevent dripping if not approved operator
@@ -91,11 +93,16 @@ contract Tests is OptimismFaucetTest {
         BOB.drain(address(BOB));
     }
 
+    /// @notice Cannot change the token to dripp if not super operator
+    function testFailUpdateTokenDrip() public {
+        BOB.updateTokenDrip(address(BOB));
+    }
+
     /// @notice Returns correct number of available drips
     function testCorrectDripCount() public {
         (uint256 ethDrips, uint256 daiDrips) = FAUCET.availableDrips();
         assertEq(ethDrips, 100);
-        assertEq(daiDrips, 100);
+        assertEq(daiDrips, 1000);
     }
 
     /// @notice Allows super operators to update drip amounts

@@ -153,6 +153,27 @@
   }
 }
 
+.content__unclaimed_kovan {
+  display: flex;
+  padding: 10px 0px 20px 0px;
+  align-items: center;
+
+  > input {
+    width: auto;
+    margin: 0px;
+    transform: scale(1.3);
+    margin-left: 5px;
+    cursor: pointer;
+  }
+
+  > label {
+    padding-left: 10px;
+    display: inline-block;
+    font-size: 14px;
+    color: rgb(114, 114, 114);
+  }
+}
+
 .button__main {
   width: 100%;
   margin-top: 20px;
@@ -221,4 +242,9 @@
       width: 100%;
     }
   }
+}
+
+.home__card_details_hr {
+  border: 1px solid rgb(134, 134, 134);
+  background-color: rgb(134, 134, 134);
 }

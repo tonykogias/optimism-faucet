@@ -17,17 +17,17 @@ function generateTxData(recipient: string, githubid: string): string {
   return iface.encodeFunctionData("drip", [recipient, githubid]);
 }
 
-async function processDrip(wallet: ethers.Wallet, data: string): Promise<void> {
+async function processDrip(wallet: ethers.Wallet, isClaimKovan: boolean, data: string): Promise<void> {
   // Collect provider
   const provider = new ethers.providers.StaticJsonRpcProvider(
-    process.env.OP_KOVAN_RPC_URL
+    isClaimKovan ? process.env.OP_KOVAN_RPC_URL : process.env.OP_GOERLI_RPC_URL
   );
   // Connect wallet to network
   const rpcWallet = wallet.connect(provider);
   // Collect nonce for network
   const nonce = await provider.getTransactionCount(
     // Collect nonce for operator
-    process.env.OPERATOR_PUBLIC_ADDRESS ?? ""
+    process.env.OPERATOR_PUBLIC_ADDRESS_GOERLI ?? ""
   );
   // Collect gas price * 2 for network
   const gasPrice = (await provider.getGasPrice()).mul(2);
@@ -35,7 +35,7 @@ async function processDrip(wallet: ethers.Wallet, data: string): Promise<void> {
   // Return populated transaction
   try {
     const response = await rpcWallet.sendTransaction({
-      to: process.env.FAUCET_ADDRESS,
+      to: process.env.FAUCET_ADDRESS_GOERLI,
       from: wallet.address,
       gasPrice,
       gasLimit: 500_000,
@@ -51,7 +51,7 @@ async function processDrip(wallet: ethers.Wallet, data: string): Promise<void> {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const session: any = await getSession({ req });
   // Collect address
-  const { address } = req.body;
+  const { address, isClaimKovan }: { address: string; isClaimKovan: boolean } = req.body;
   if (!session) {
     // Return unauthed status
     return res.status(401).send({ error: "Not authenticated." });
@@ -59,27 +59,31 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   // Anti-bot checks
   const ONE_MONTH_MILISECONDS = 2629800000;
   if (
-    session.github_following < 5 ||
     // Less than 1 month old
-    new Date().getTime() - new Date(session.github_created_at).getTime() <
-      ONE_MONTH_MILISECONDS
+    new Date().getTime() - new Date(session.github_created_at).getTime() < ONE_MONTH_MILISECONDS
   ) {
     // Return invalid Github account status
     return res
       .status(400)
-      .send({ error: "Github account does not pass anti-bot checks." });
+      .send({ error: "Github anti-bot checks failed: Your must be older than 1 month" });
+  }
+  if (session.github_following < 5) {
+    // Return invalid Github account status
+    return res
+      .status(400)
+      .send({ error: "Github anti-bot checks failed: You need at least 5 followings" });
   }
   if (!address || !isValidAddress(address)) {
     // Return invalid address status
     return res.status(400).send({ error: "Invalid address." });
   }
-  const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY ?? "");
+  const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY_GOERLI ?? "");
   const provider = new ethers.providers.StaticJsonRpcProvider(
-    process.env.OP_KOVAN_RPC_URL
+    isClaimKovan ? process.env.OP_KOVAN_RPC_URL : process.env.OP_GOERLI_RPC_URL
   );
   // Return error if faucet is empty.
   const contractBalance = ethers.utils.formatEther(
-    await provider.getBalance(process.env.FAUCET_ADDRESS ?? "")
+    await provider.getBalance(process.env.FAUCET_ADDRESS_GOERLI ?? "")
   );
   if (parseFloat(contractBalance) < 1) {
     return res.status(500).send({ error: "Faucet is empty." });
@@ -95,7 +99,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const data: string = generateTxData(address, session.github_id);
   try {
     // Process faucet claims
-    await processDrip(wallet, data);
+    await processDrip(wallet, isClaimKovan, data);
   } catch (e) {
     // If error in process, revert
     return res.status(500).send({ error: "Error while claiming." });

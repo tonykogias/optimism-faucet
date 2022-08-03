@@ -80,6 +80,12 @@ contract OptimismFaucetUser {
         );
     }
 
+    /// @notice Updates token address
+    /// @param _TOKEN token address to change to
+    function updateTokenDrip(address _TOKEN) public {
+        FAUCET.updateTokenDrip(_TOKEN);
+    }
+
     /// @notice Allows receiving ETH
     receive() external payable {}
 }

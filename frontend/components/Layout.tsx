@@ -36,8 +36,8 @@ function Head() {
   return (
     <HTMLHead>
       <link rel="shortcut icon" href="/faucet-op.png" />
-      <title>Faucet | Optimism Kovan</title>
-      <meta name="title" content="Optimism Kovan Faucet" />
+      <title>Faucet | Optimism Goerli</title>
+      <meta name="title" content="Optimism Goerli Faucet" />
     </HTMLHead>
   );
 }
