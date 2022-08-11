@@ -85,7 +85,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const contractBalance = ethers.utils.formatEther(
     await provider.getBalance(process.env.FAUCET_ADDRESS_GOERLI ?? "")
   );
-  if (parseFloat(contractBalance) < 1) {
+  if (parseFloat(contractBalance) < 0.2) {
     return res.status(500).send({ error: "Faucet is empty." });
   }
   // Return error if the address to drip has already more than 5 ETH

@@ -70,7 +70,7 @@ export default function Home({ session }: any) {
           <h1>Optimism Goerli Faucet</h1>
         </div>
         <span>
-          Fund your wallet with 1 ETH and 100 OP on the Optimism Goerli network.
+          Fund your wallet with 0.2 ETH and 100 OP on the Optimism Goerli network.
         </span>
       </div>
       <div className={styles.home__card}>
