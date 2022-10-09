@@ -1,6 +1,6 @@
 # Optimism Faucet
 
-A [faucet](https://en.wikipedia.org/wiki/History_of_bitcoin#Bitcoin_faucets) that drips 1 ETH and 100 DAI to the Optimism Kovan network.
+A [faucet](https://en.wikipedia.org/wiki/History_of_bitcoin#Bitcoin_faucets) that drips 0.2 ETH and 100 DAI to the Optimism Goerli network.
 
 READMEs can be found individual in subdirectories:
 

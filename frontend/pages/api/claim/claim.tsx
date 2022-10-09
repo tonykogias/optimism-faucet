@@ -17,10 +17,10 @@ function generateTxData(recipient: string, githubid: string): string {
   return iface.encodeFunctionData("drip", [recipient, githubid]);
 }
 
-async function processDrip(wallet: ethers.Wallet, isClaimKovan: boolean, data: string): Promise<void> {
+async function processDrip(wallet: ethers.Wallet, data: string): Promise<void> {
   // Collect provider
   const provider = new ethers.providers.StaticJsonRpcProvider(
-    isClaimKovan ? process.env.OP_KOVAN_RPC_URL : process.env.OP_GOERLI_RPC_URL
+    process.env.OP_GOERLI_RPC_URL
   );
   // Connect wallet to network
   const rpcWallet = wallet.connect(provider);
@@ -51,7 +51,7 @@ async function processDrip(wallet: ethers.Wallet, isClaimKovan: boolean, data: s
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const session: any = await getSession({ req });
   // Collect address
-  const { address, isClaimKovan }: { address: string; isClaimKovan: boolean } = req.body;
+  const { address }: { address: string } = req.body;
   if (!session) {
     // Return unauthed status
     return res.status(401).send({ error: "Not authenticated." });
@@ -79,7 +79,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
   const wallet = new ethers.Wallet(process.env.OPERATOR_PRIVATE_KEY_GOERLI ?? "");
   const provider = new ethers.providers.StaticJsonRpcProvider(
-    isClaimKovan ? process.env.OP_KOVAN_RPC_URL : process.env.OP_GOERLI_RPC_URL
+    process.env.OP_GOERLI_RPC_URL
   );
   // Return error if faucet is empty.
   const contractBalance = ethers.utils.formatEther(
@@ -99,7 +99,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const data: string = generateTxData(address, session.github_id);
   try {
     // Process faucet claims
-    await processDrip(wallet, isClaimKovan, data);
+    await processDrip(wallet, data);
   } catch (e) {
     // If error in process, revert
     return res.status(500).send({ error: "Error while claiming." });

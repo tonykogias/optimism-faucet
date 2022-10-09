@@ -32,7 +32,7 @@ git submodule update --init --recursive
 forge build
 # Run tests
 forge test
-# Deploy contracts to OP Kovan
+# Deploy contracts to OP Goerli
 forge create --rpc-url <your_rpc_url> --private-key <your_private_key> src/OptimismFaucet.sol:OptimismFaucet
 
 ```

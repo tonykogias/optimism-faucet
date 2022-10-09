@@ -34,8 +34,6 @@ export default function Home({ session }: any) {
   const [address, setAddress] = useState<string>("");
   // Loading status
   const [loading, setLoading] = useState<boolean>(false);
-  // Claim Kovan
-  const [claimKovan, setClaimKovan] = useState<boolean>(false);
 
   /**
    * Processes a claim to the faucet
@@ -46,7 +44,7 @@ export default function Home({ session }: any) {
 
     try {
       // Post new claim with recipient address
-      await axios.post("/api/claim/claim", { address, isClaimKovan: claimKovan});
+      await axios.post("/api/claim/claim", { address });
       // Toast if success + toggle claimed
       toast.success("Tokens dispersed—check balances!", {
         theme: "colored",
@@ -100,7 +98,7 @@ export default function Home({ session }: any) {
                 </a>
               </p>
               <button
-                className={styles.button__main}
+                className={styles.button__github}
                 onClick={() => signIn("github")}
               >
                 Sign In with Github
@@ -119,18 +117,6 @@ export default function Home({ session }: any) {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                 />
-
-                {/* Kovan checkbox */}
-                <div className={styles.content__unclaimed_kovan}>
-                  <input
-                    type="checkbox"
-                    value={claimKovan.toString()}
-                    onChange={() => setClaimKovan((previous) => !previous)}
-                  />
-                  <label>
-                    Fund your wallet on Optimism Kovan
-                  </label>
-                </div>
 
                 {isValidAddress(address) ? (
                   <button
@@ -162,17 +148,7 @@ export default function Home({ session }: any) {
         </div>
         <div className={styles.home__card_content}>
           <h4>Github Authentication</h4>
-          <p>To pass the anti-bot checks your github account must be older than 1 month and have more than 5 followings.</p>
-          <hr className={styles.home__card_details_hr}/>
-          <h4>Optimism Kovan Support</h4>
-          <p>Optimism Kovan is being{" "} 
-            <a
-               href="https://dev.optimism.io/kovan-to-goerli/"
-               target="_blank"
-               rel="noopener noreferrer"
-            >
-              deprecated
-            </a>, and the faucet migrated to Goerli. The faucet will keep providing ETH and DAI for Kovan until it runs out.</p>
+          <p>To pass the anti-bot checks your github account must be older than one month and you have to follow five people/projects on github. If you don&apos;t have an eligible github account, try <a href="https://faucet.paradigm.xyz" target="_blank" rel="noreferrer">Paradigm Faucet</a></p>
         </div>
       </div>
     </Layout>
