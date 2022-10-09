@@ -26,13 +26,13 @@ export default NextAuth({
   },
   callbacks: {
     // Running when use signin/signout
-    async jwt({ token, user, profile }) {
+    async jwt({ token, user }) {
       const isSignIn = !!user;
       if (isSignIn) {
         token.github_id = user?.id;
-        token.github_name = profile?.login;
-        token.github_following = profile?.following;
-        token.github_created_at = profile?.created_at;
+        token.github_name = user?.login;
+        token.github_following = user?.following;
+        token.github_created_at = user?.created_at;
       }
 
       // Resolve JWT
