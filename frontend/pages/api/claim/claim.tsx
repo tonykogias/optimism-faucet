@@ -93,8 +93,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const addressBalance = ethers.utils.formatEther(
     await provider.getBalance(address ?? "")
   );
-  if (parseFloat(addressBalance) > 5) {
-    return res.status(500).send({ error: "Address has more than 5 ETH." });
+  if (parseFloat(addressBalance) > 3) {
+    return res.status(500).send({ error: "Address has more than 3 ETH." });
   }
   // Generate transaction data
   const data: string = generateTxData(address, session.github_id);
