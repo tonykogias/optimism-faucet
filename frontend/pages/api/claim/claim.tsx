@@ -43,8 +43,9 @@ async function processDrip(wallet: ethers.Wallet, data: string): Promise<void> {
       nonce,
       type: 0,
     });
+    await response.wait();
   } catch (e) {
-    throw new Error("Error when processing drip for network.");
+    throw new Error(" have claimed in the last 24hours.");
   }
 }
 
@@ -102,7 +103,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     await processDrip(wallet, data);
   } catch (e) {
     // If error in process, revert
-    return res.status(500).send({ error: "Error while claiming." });
+    return res.status(500).send({ error: `${e}` });
   }
 
   return res.status(200).send({ claimed: address });
